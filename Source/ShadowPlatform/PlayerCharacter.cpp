@@ -1,0 +1,84 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "PlayerCharacter.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+
+// Sets default values
+APlayerCharacter::APlayerCharacter()
+{
+ 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+}
+
+// Called when the game starts or when spawned
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+
+		if (Subsystem) {
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+}
+
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+// Called to bind functionality to input
+
+
+void APlayerCharacter::MoveForward(const FInputActionValue& Value)
+{
+	float Movement = Value.Get<float>();
+	if (Controller != nullptr)
+	{
+		AddMovementInput(GetActorForwardVector(), Movement);
+	}
+}
+
+void APlayerCharacter::MoveRight(const FInputActionValue& Value)
+{
+	float Movement = Value.Get<float>();
+	if (Controller != nullptr)
+	{
+		AddMovementInput(GetActorRightVector(), Movement);
+	}
+}
+
+void APlayerCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxis = Value.Get<FVector2D>();
+	if (Controller != nullptr)
+	{
+		AddControllerYawInput(LookAxis.X);
+		AddControllerPitchInput(-LookAxis.Y);
+	}
+}
+
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInputComponent)
+	{
+			EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &APlayerCharacter::MoveForward);
+			EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &APlayerCharacter::MoveRight);
+			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+	}
+}
