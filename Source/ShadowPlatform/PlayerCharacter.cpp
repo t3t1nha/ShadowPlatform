@@ -5,6 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "Camera/CameraComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -35,6 +37,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void APlayerCharacter::CalculateStartEndVectors(const UCameraComponent* Camera, FVector& Start, FVector& End)
+{
+	FVector StartPosition = Camera->GetComponentLocation();
+	FVector ForwardVector = UKismetMathLibrary::GetForwardVector(Camera->GetComponentRotation());
+	
+	Start = StartPosition;
+	End = StartPosition + ForwardVector * InteractDistance;
 }
 
 // Called to bind functionality to input
