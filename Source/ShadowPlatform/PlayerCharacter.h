@@ -40,6 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Input")
 	void Look(const FInputActionValue& Value); 
 
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void Climb(const FInputActionValue& Value);
+
 public:
 
 	/*			Camera Component			*/

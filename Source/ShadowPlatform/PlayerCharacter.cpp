@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -79,6 +80,16 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void APlayerCharacter::Climb(const FInputActionValue& Value)
+{
+	float Movement = Value.Get<float>();
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	if (Controller != nullptr)
+	{
+		AddMovementInput(GetActorUpVector(), Movement);
+	}
+}
+
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -86,7 +97,6 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (EnhancedInputComponent)
 	{
-			EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &APlayerCharacter::MoveForward);
 			EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &APlayerCharacter::MoveRight);
 			EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APlayerCharacter::Look);
 			EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
